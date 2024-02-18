@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T14:48:32.477Z
+# Modified: 2024-02-18T16:07:59.613Z
 
 on:
   pull_request:
@@ -51,6 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Script"
+        id: situation-switch
         env:
           GITHUB_REF: ${{ github.ref }}       
           GITHUB_REF_NAME: ${{ github.ref_name }} 
@@ -106,4 +107,136 @@ jobs:
                 echo "BUILD: $BUILD"
               fi
             fi
+          elif [[ "$GITHUB_HEAD_REF" =~ ^[Rr][Ee][Ll][Ee][Aa][Ss][Ee]/(.+) ]]; then
+            # Branch-Name extrahieren
+            BRANCH_NAME=${BASH_REMATCH[1]}
+            # Prüfen, ob das Event ein Pull Request ist
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              # Aktion des Pull Requests ermitteln
+              ACTION=$GITHUB_EVENT_ACTION
+              # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
+              if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
+                # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_BRANCH_NAME="dev"
+                CHECK_FOR_UPDATE=true
+                BUILD=false
+                echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
+              fi
+            fi
+          elif [[ "$GITHUB_HEAD_REF" =~ ^[Hh][Oo][Tt][Ff][Ii][Xx]/(.+) ]]; then
+            # Branch-Name extrahieren
+            BRANCH_NAME=${BASH_REMATCH[1]}
+            # Prüfen, ob das Event ein Pull Request ist
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              # Aktion des Pull Requests ermitteln
+              ACTION=$GITHUB_EVENT_ACTION
+              # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
+              if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
+                # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_BRANCH_NAME="dev"
+                CHECK_FOR_UPDATE=true
+                BUILD=false
+                echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
+              fi
+            fi
+          else
+            echo "PR does not originate from a feature branch or from another permitted branch. Workflow is skipped."
+            exit 1
           fi
+          echo "run-build=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "run-update-check=$CHECK_FOR_UPDATE" >> "$GITHUB_OUTPUT"
+          echo "branch-name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "clean-version-name=$CLEAN_VERSION_NAME" >> "$GITHUB_OUTPUT"
+    outputs:
+      run_build: ${{ steps.situation-switch.outputs.run-build }}
+      run_update_check: ${{ steps.situation-switch.outputs.run-update-check}}
+      branch_name:  ${{ steps.situation-switch.outputs.branch-name }}
+      clean_version_name:  ${{ steps.situation-switch.outputs.clean-version-name }}
+  run_update_check:
+    name: "Update Check"
+    needs:
+      - situation_switch
+    if: ${{ needs.situation_switch.outputs.run_update_check == 'true' && vars.VERSION_FILE_ENABLE == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Setup yq'
+        uses: dcarbone/install-yq-action@v1.1.1
+        with:
+          version: "v4.35.1"
+          download-compressed: "true"
+          force: "false"
+      - name: 'Check yq'
+        run: |
+          which yq
+          yq --version
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Check for Update"
+        id: run-update-check
+        env:
+          VERSION_FILE_PATH: ${{ vars.VERSION_FILE_PATH }}
+          NEW_VERSION: ${{ needs.situation_switch.outputs.clean_version_name}}
+        run: |
+          CREATE_PULL_REQUEST=false
+          # Aktuelle Version aus der YAML-Datei lesen
+          CURRENT_VERSION=$(yq eval '.info.version' "$VERSION_FILE_PATH")
+          # Versionen vergleichen
+          if [[ "$CURRENT_VERSION" == "$NEW_VERSION" ]]; then
+            echo "Version identisch: $CURRENT_VERSION"
+            CREATE_PULL_REQUEST=false
+            echo "Kein Update Notwendig"
+          else
+            echo "Versionen unterschiedlich: aktuell $CURRENT_VERSION, neue Version $NEW_VERSION"
+            # YAML-Datei aktualisieren
+            yq eval '.info.version = "'"$NEW_VERSION"'" -i "$VERSION_FILE_PATH"
+            echo "YAML-Datei aktualisiert: $NEW_VERSION"
+            CREATE_PULL_REQUEST=true
+            echo "Update durchgeführt"
+          fi
+          echo "create-pull-request=$CREATE_PULL_REQUEST" >> "$GITHUB_OUTPUT"
+      - name: "Create Pull Request"
+        if: ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
+        id: create_pull_request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: version-file/${{ needs.situation_switch.outputs.clean_version_name}}
+          title: "version-file/${{ needs.situation_switch.outputs.clean_version_name}}"
+          body: "Update Version-File to ${{ needs.situation_switch.outputs.clean_version_name}}"
+          labels: automerge,!work in progress
+          base:  ${{ github.head_ref }}
+          token: ${{ secrets.REPOSITORY_TOKEN }}
+      - name: "Automerge PullRequest"
+        if:  ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
+        id: automerge_pull_request
+        uses: pascalgn/automerge-action@v0.16.2
+        env:
+          GITHUB_TOKEN: "${{ secrets.REPOSITORY_TOKEN }}"
+          MERGE_LABELS: "automerge,!work in progress"
+          UPDATE_RETRIES: "25"
+          UPDATE_RETRY_SLEEP: "10000"
+          MERGE_RETRIES: "30"
+          MERGE_RETRY_SLEEP: "10000"
+          MERGE_DELETE_BRANCH: "true"
+          MERGE_REQUIRED_APPROVALS: "0"
+          PULL_REQUEST: "${{ steps.create_pull_request.outputs.pull-request-number }}"
+    outputs:
+      pull_request_number: ${{ steps.create_pull_request.outputs.pull-request-number }}
+  #SECTION - build
+  build:
+    name: "Possible build process"
+    needs: 
+      - situation_switch
+      - run_update_check
+    if: ${{ !failure() && needs.situation_switch.outputs.run_build == 'true' && needs.run_update_check.outputs.pull_request_number == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Output"
+        run: |
+          echo "The build process could take place here"
+  #!SECTION
