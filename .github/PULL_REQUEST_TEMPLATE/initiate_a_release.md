@@ -17,7 +17,7 @@
  2. Click the Link: [Create Release/Hotfix](../actions/workflows/gitflow_create_release.yml)
  3. **Ignore the branch selection.** Releases are automatically generated from the `dev` branch, and hotfixes from the `main` branch.
 
-<img src="https://github.com/jonathan8devs/gitflow/blob/dev/.github/PULL_REQUEST_TEMPLATE/initiate_a_release.png?raw=true" alt="View of the workflow" height=auto width="50%" style="display:block; margin: 1em auto">
+<img src="https://github.com/jonathan8devs/gitflow/blob/dev/.github/PULL_REQUEST_TEMPLATE/initiate_a_release.png?raw=true" alt="View of the workflow" height=auto width="100%" style="display:block; margin: 1em auto">
 
 ## Versioning
 
