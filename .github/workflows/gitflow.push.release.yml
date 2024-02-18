@@ -2,7 +2,7 @@
 # gitflow.push.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T16:29:01.700Z
-# Modified: 2024-02-18T17:47:18.421Z
+# Modified: 2024-02-18T17:55:33.564Z
 on:
   push:
     branches:
@@ -70,7 +70,7 @@ jobs:
         run: |
           CREATE_PULL_REQUEST=false
           BUILD=false
-          NEW_VERSION=${GITHUB_REF_NAME#release/}-RC
+          NEW_VERSION=${GITHUB_REF_NAME#release/}
           # Aktuelle Version aus der YAML-Datei lesen
           CURRENT_VERSION=$(yq eval '.info.version' "$VERSION_FILE_PATH")
           # Versionen vergleichen
