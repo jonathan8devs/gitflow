@@ -1,3 +1,3 @@
 # gitflow
 
-Von dem erstellten Feature-Branch wird ein PR auf den dev Branch erstellt
+So wie es aussieht läuft der Hase mit pr.dev.yml
