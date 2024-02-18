@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T16:21:22.876Z
+# Modified: 2024-02-18T16:34:43.549Z
 
 on:
   pull_request:
@@ -15,7 +15,6 @@ jobs:
     name: "Analysiere Situation"
     runs-on: ubuntu-latest
     steps:
-      #NOTE - If the variable `DEBUG_CONTEXT` is set to `true`, the GitHub context variables are output as JSON.
       - name: Debug of GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -46,6 +45,7 @@ jobs:
           echo "GITHUB_EVENT_REF: $GITHUB_EVENT_REF"
           echo "GITHUB_CONTEXT: $GITHUB_CONTEXT"
   #!SECTION
+  #SECTION - situation_switch
   situation_switch:
     name: "Switch"
     runs-on: ubuntu-latest
@@ -156,6 +156,8 @@ jobs:
       run_update_check: ${{ steps.situation-switch.outputs.run-update-check}}
       branch_name:  ${{ steps.situation-switch.outputs.branch-name }}
       clean_version_name:  ${{ steps.situation-switch.outputs.clean-version-name }}
+  #!SECTION
+  #SECTION - run_update_check
   run_update_check:
     name: "Update Check"
     needs:
@@ -227,6 +229,7 @@ jobs:
           PULL_REQUEST: "${{ steps.create_pull_request.outputs.pull-request-number }}"
     outputs:
       pull_request_number: ${{ steps.create_pull_request.outputs.pull-request-number }}
+  #!SECTION
   #SECTION - build
   build:
     name: "Possible build process"
