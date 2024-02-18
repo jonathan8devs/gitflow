@@ -2,12 +2,12 @@
 # gitflow.push.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T16:29:01.700Z
-# Modified: 2024-02-18T17:26:29.881Z
+# Modified: 2024-02-18T17:31:39.888Z
 on:
   push:
     branches:
-      - 'release/*'
-name: "Gitflow: on - push - branches - release/"
+      - 'hotfix/*'
+name: "Gitflow: on - push - branches - hotfix/"
 jobs:
   analyze_situation:
     name: "Analysiere Situation"
@@ -70,7 +70,7 @@ jobs:
         run: |
           CREATE_PULL_REQUEST=false
           BUILD=false
-          NEW_VERSION=${GITHUB_REF_NAME#release/}
+          NEW_VERSION=${GITHUB_REF_NAME#hotfix/}
           NEW_VERSION=${NEW_VERSION%-RC}
           # Aktuelle Version aus der YAML-Datei lesen
           CURRENT_VERSION=$(yq eval '.info.version' "$VERSION_FILE_PATH")

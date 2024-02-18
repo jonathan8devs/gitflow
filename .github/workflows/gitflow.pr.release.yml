@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T16:46:44.941Z
+# Modified: 2024-02-18T17:28:59.395Z
 
 on:
   pull_request:
@@ -80,7 +80,7 @@ jobs:
               # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
               if [[ $ACTION == 'opened' || $ACTION == 'synchronize' || $ACTION == 'reopened' ]]; then
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
-                CLEAN_VERSION_NAME=hotfix-feature-$BRANCH_NAME
+                CLEAN_VERSION_NAME=release-feature-$BRANCH_NAME
                 CHECK_FOR_UPDATE=true
                 BUILD=true
                 echo "Feature-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
@@ -167,7 +167,7 @@ jobs:
           echo "create-pull-request=$CREATE_PULL_REQUEST" >> "$GITHUB_OUTPUT"
       - name: "Create Pull Request"
         if: ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
-        id: create_pull_request
+        id: create-pull-request
         uses: peter-evans/create-pull-request@v6
         with:
           branch: version-file/${{ needs.situation_switch.outputs.clean_version_name}}
@@ -178,7 +178,7 @@ jobs:
           token: ${{ secrets.REPOSITORY_TOKEN }}
       - name: "Automerge PullRequest"
         if:  ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
-        id: automerge_pull_request
+        id: automerge-pull-request
         uses: pascalgn/automerge-action@v0.16.2
         env:
           GITHUB_TOKEN: "${{ secrets.REPOSITORY_TOKEN }}"
@@ -189,9 +189,9 @@ jobs:
           MERGE_RETRY_SLEEP: "10000"
           MERGE_DELETE_BRANCH: "true"
           MERGE_REQUIRED_APPROVALS: "0"
-          PULL_REQUEST: "${{ steps.create_pull_request.outputs.pull-request-number }}"
+          PULL_REQUEST: "${{ steps.create-pull-request.outputs.pull-request-number }}"
     outputs:
-      pull_request_number: ${{ steps.create_pull_request.outputs.pull-request-number }}
+      pull_request_number: ${{ steps.create-pull-request.outputs.pull-request-number }}
   #!SECTION
   #SECTION - build
   build:

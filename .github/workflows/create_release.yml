@@ -1,0 +1,66 @@
+on:
+  workflow_dispatch:
+    inputs:
+      version_increment:
+        description: 'Select the type of release! (Recommended)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - hotfix
+          - patch
+          - minor
+          - major
+      version:
+        description: "After a hotfix it is necessary to define the next version number yourself major.minor.patch! The version can also be set here if you do not want the version to be incremented automatically!"
+        required: false
+name: "🛫 Create Release/Hotfix"
+jobs:
+  create_release_branch:
+    name: "Create Release Branch"
+    # Checks that the request is not a `hotfix` 
+    if: ${{ github.event.inputs.version_increment != 'hotfix' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Runs the Github action for Gitflow.
+      - name: gitflow-workflow-action create release
+        uses: hoangvvo/gitflow-workflow-action@0.3.7
+        with:
+          develop_branch: "dev"
+          main_branch: "main"
+          merge_back_from_main: false
+          version_increment: ${{ github.event.inputs.version_increment }}
+          version: ${{ github.event.inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
+  create_hotfix_branch:
+    name: "Create Hotfix Branch"
+    # Checks that the request is a `hotfix` 
+    if: ${{ github.event.inputs.version_increment == 'hotfix' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository with the 'main'-branch 
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      # Define a temporary name for the `hotfix` branch and write it to a file to avoid an empty PullRequest
+      - name: "Set current Date"
+        id: create-temporary-name
+        run: |
+          DATE_TIME=$(date +'%Y%m%d%H%M')
+          echo "hotfix/$DATE_TIME # hotfix_helper_file can be overwritten at any time. It is only used to avoid an empty Pull Request." > .hotfix_helper_file
+          echo "temporary-hotfix-name=$DATE_TIME" >> $GITHUB_OUTPUT
+      # Create the pull request on the `main` branch
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: hotfix/${{ steps.create-temporary-name.outputs.temporary-hotfix-name }}
+          title: "Hotfix ${{ steps.create-temporary-name.outputs.temporary-hotfix-name }}"
+          body: "Pull request for hotfix version ${{ steps.create-temporary-name.outputs.temporary-hotfix-name }}"
+          base: main
+          commit-message: "Change to avoid creating an empty Pull Request."
