@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T20:45:24.267Z
+# Modified: 2024-02-18T21:01:03.577Z
 
 on:
   pull_request:
@@ -241,7 +241,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Deployment
-        uses: ${{ github.repository }}/.github/actions/deployment@dev
+        uses: jonathan8devs/gitflow/.github/actions/deployment@dev
         with:
           environment: 'Wert1'
           version: 'Wert2'
