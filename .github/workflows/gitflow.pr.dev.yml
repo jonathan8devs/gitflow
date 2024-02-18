@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T14:20:40.161Z
+# Modified: 2024-02-18T14:41:36.921Z
 
 on:
   pull_request:
@@ -68,9 +68,9 @@ jobs:
           BUILD=false
 
           # Prüfen, ob der Branch-Name mit "feature/" beginnt
-          if [[ "$GITHUB_HEAD_REF" =~ ^[Ff][eE][aA][tT][uU][rR][eE]/(.+) ]]; then
+          if [[ "$GITHUB_HEAD_REF" =~ ^[Ff][Ee][Aa][Tt][Uu][Rr][Ee]/(.+) ]]; then
             # Branch-Name extrahieren
-            FEATURE_NAME=${BASH_REMATCH[1]}
+            BRANCH_NAME=${BASH_REMATCH[1]}
             # Prüfen, ob das Event ein Pull Request ist
             if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
               # Aktion des Pull Requests ermitteln
@@ -80,7 +80,26 @@ jobs:
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
                 CHECK_FOR_UPDATE=true
                 BUILD=true
-                echo "Feature-Branch: $FEATURE_NAME hat erfolgreich gezogen!"
+                echo "Feature-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
+              fi
+            fi
+          elif [[ "$GITHUB_HEAD_REF" =~ ^[Vv][Ee][Rr][Ss][Ii][Oo][Nn]-[Ff][Ii][Ll][Ee]/(.+) ]]; then
+            # Branch-Name extrahieren
+            BRANCH_NAME=${BASH_REMATCH[1]}
+            # Prüfen, ob das Event ein Pull Request ist
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              # Aktion des Pull Requests ermitteln
+              ACTION=$GITHUB_EVENT_ACTION
+              # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
+              if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
+                # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CHECK_FOR_UPDATE=false
+                BUILD=false
+                echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
               fi
             fi
           fi
