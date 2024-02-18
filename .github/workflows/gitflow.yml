@@ -2,7 +2,7 @@
 # gitflow.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T17:31:03.041Z
-# Modified: 2024-02-18T18:02:01.086Z
+# Modified: 2024-02-18T18:02:28.465Z
 on:
   pull_request:
     types:
@@ -11,7 +11,7 @@ on:
       - labeled
     branches: 
       - main
-name: Release Workflows
+name: "Gitflow: Release Workflows"
 jobs:
   release_workflow:
     runs-on: ubuntu-latest
