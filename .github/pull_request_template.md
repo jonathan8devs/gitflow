@@ -14,15 +14,15 @@ We use Gitflow as the basis for our GitHub repositories. You can find a descript
 ## I would like to:
 
 ### Develop
-- **[Add a new feature to the `dev`-Branch](https://web.de)**
+- **[Add a new feature to the `dev`-Branch](?expand=1&template=query_create_feature.md)**
 
 ### Release
 - **[Initiate a release](?expand=1&template=initiate_a_release.md)**
-- **[Add a change or feature to the current `release`-branch](https://web.de)**
+- **[Add a change or feature to the current `release`-branch](?expand=1&template=query_change_release_hotfix.md)**
 
 ### Hotfix
 - **[Initiate a hotfix](?expand=1&template=initiate_a_release.md)**
-- **[Add a change or feature to the current `hotfix`-branch](https://web.de)**
+- **[Add a change or feature to the current `hotfix`-branch](?expand=1&template=query_change_release_hotfix.md)**
 
 
 ## Gitflow-Workflow
