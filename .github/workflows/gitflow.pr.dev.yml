@@ -2,13 +2,13 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T17:28:59.395Z
+# Modified: 2024-02-18T19:04:18.992Z
 
 on:
   pull_request:
     branches:
-      - 'release/*'
-name: "Gitflow: on - pull_request - branches - release"
+      - dev
+name: "⚙️ Gitflow: pull_request_branch_dev"
 jobs:
   #SECTION - Analyze Situation
   analyze_situation:
@@ -80,12 +80,13 @@ jobs:
               # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
               if [[ $ACTION == 'opened' || $ACTION == 'synchronize' || $ACTION == 'reopened' ]]; then
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
-                CLEAN_VERSION_NAME=release-feature-$BRANCH_NAME
+                CLEAN_VERSION_NAME=feature-$BRANCH_NAME
                 CHECK_FOR_UPDATE=true
                 BUILD=true
                 echo "Feature-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
                 echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
                 echo "BUILD: $BUILD"
+
               fi
             fi
           elif [[ "$GITHUB_HEAD_REF" =~ ^[Vv][Ee][Rr][Ss][Ii][Oo][Nn]-[Ff][Ii][Ll][Ee]/(.+) ]]; then
@@ -100,6 +101,42 @@ jobs:
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
                 CLEAN_VERSION_NAME=$BRANCH_NAME
                 CHECK_FOR_UPDATE=false
+                BUILD=false
+                echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
+              fi
+            fi
+          elif [[ "$GITHUB_HEAD_REF" =~ ^[Rr][Ee][Ll][Ee][Aa][Ss][Ee]/(.+) ]]; then
+            # Branch-Name extrahieren
+            BRANCH_NAME=${BASH_REMATCH[1]}
+            # Prüfen, ob das Event ein Pull Request ist
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              # Aktion des Pull Requests ermitteln
+              ACTION=$GITHUB_EVENT_ACTION
+              # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
+              if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
+                # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_VERSION_NAME="dev"
+                CHECK_FOR_UPDATE=true
+                BUILD=false
+                echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
+                echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
+                echo "BUILD: $BUILD"
+              fi
+            fi
+          elif [[ "$GITHUB_HEAD_REF" =~ ^[Hh][Oo][Tt][Ff][Ii][Xx]/(.+) ]]; then
+            # Branch-Name extrahieren
+            BRANCH_NAME=${BASH_REMATCH[1]}
+            # Prüfen, ob das Event ein Pull Request ist
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              # Aktion des Pull Requests ermitteln
+              ACTION=$GITHUB_EVENT_ACTION
+              # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
+              if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
+                # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_VERSION_NAME="dev"
+                CHECK_FOR_UPDATE=true
                 BUILD=false
                 echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
                 echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
