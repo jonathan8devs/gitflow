@@ -2,7 +2,7 @@
 # gitflow.push.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T16:29:01.700Z
-# Modified: 2024-02-18T19:03:15.160Z
+# Modified: 2024-02-18T21:14:22.731Z
 on:
   push:
     branches:
@@ -42,6 +42,26 @@ jobs:
           echo "GITHUB_EVENT_ACTION: $GITHUB_EVENT_ACTION"
           echo "GITHUB_EVENT_REF: $GITHUB_EVENT_REF"
           echo "GITHUB_CONTEXT: $GITHUB_CONTEXT"
+  #SECTION - check_security
+  check_security:
+    name: "Search for security problems"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download .gitleaks.toml from Server-Repository
+        run: |
+          curl -H 'Authorization: token ${{ secrets.REPOSITORY_TOKEN }}' \
+          -H 'Accept: application/vnd.github.v3.raw' \
+          -o .gitleaks.toml \
+          -L https://api.github.com/repos/8devs/Server/contents/.gitleaks.toml?ref=main
+      - uses: gitleaks/gitleaks-action@v2.3.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
+          GITLEAKS_NOTIFY_USER_LIST: ${{ vars.GITLEAKS_NOTIFY_USER_LIST}}
+  #!SECTION
   #SECTION - run_update_check
   run_update_check:
     name: "Update Check"
