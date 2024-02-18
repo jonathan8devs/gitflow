@@ -13,11 +13,11 @@
 **Manual creation of `release` or `hotfix` branches is not recommended!** To ensure proper workflow, these branches should be generated automatically through a predefined process.
 
 ## Here's how to create the correct branch
+ 1. Read the entire note before you continue
+ 2. Click the Link: [Create Release/Hotfix](../actions/workflows/gitflow_create_release.yml)
+ 3. **Ignore the branch selection.** Releases are automatically generated from the `dev` branch, and hotfixes from the `main` branch.
 
- 1. Click the button below:<div style="text-align:center;"><a href="../actions/workflows/gitflow_create_release.yml" style="background-color: #04AA6D;border: none;color: white;padding: 15px 32px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;margin: 20px 0">Create Release/Hotfix<a></div>
- 2. **Ignore the branch selection.** Releases are automatically generated from the `dev` branch, and hotfixes from the `main` branch.
-
-
+<img src="https://github.com/jonathan8devs/gitflow/blob/dev/.github/PULL_REQUEST_TEMPLATE/initiate_a_release.png?raw=true" alt="View of the workflow" height=auto width="50%" style="display:block; margin: 1em auto">
 
 ## Versioning
 
