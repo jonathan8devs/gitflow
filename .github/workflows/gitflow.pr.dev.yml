@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T16:19:00.835Z
+# Modified: 2024-02-18T16:21:22.876Z
 
 on:
   pull_request:
@@ -80,7 +80,7 @@ jobs:
               # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
               if [[ $ACTION == 'opened' || $ACTION == 'synchronize' || $ACTION == 'reopened' ]]; then
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
-                CLEAN_VERSION_NAME=$BRANCH_NAME
+                CLEAN_VERSION_NAME=feature-$BRANCH_NAME
                 CHECK_FOR_UPDATE=true
                 BUILD=true
                 echo "Feature-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
