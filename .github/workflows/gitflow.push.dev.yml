@@ -2,12 +2,12 @@
 # gitflow.push.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T16:29:01.700Z
-# Modified: 2024-02-18T17:26:37.260Z
+# Modified: 2024-02-18T19:03:47.965Z
 on:
   push:
     branches:
       - dev
-name: "Gitflow: on - push - branches - dev"
+name: "⚙️ Gitflow: push_branches_dev"
 jobs:
   analyze_situation:
     name: "Analysiere Situation"

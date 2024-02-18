@@ -2,13 +2,13 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T17:26:13.451Z
+# Modified: 2024-02-18T20:45:24.267Z
 
 on:
   pull_request:
     branches:
       - dev
-name: "Gitflow: on - pull_request - branches - dev"
+name: "⚙️ Gitflow: pull_request_branch_dev"
 jobs:
   #SECTION - Analyze Situation
   analyze_situation:
@@ -239,7 +239,10 @@ jobs:
     if: ${{ !failure() && needs.situation_switch.outputs.run_build == 'true' && needs.run_update_check.outputs.pull_request_number == '' }}
     runs-on: ubuntu-latest
     steps:
-      - name: "Output"
-        run: |
-          echo "The build process could take place here"
+      - uses: actions/checkout@v4
+      - name: Deployment
+        uses: ${{ github.repository }}/.github/actions/deployment@dev
+        with:
+          environment: 'Wert1'
+          version: 'Wert2'
   #!SECTION

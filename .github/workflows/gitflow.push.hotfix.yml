@@ -2,12 +2,12 @@
 # gitflow.push.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T16:29:01.700Z
-# Modified: 2024-02-18T17:55:22.697Z
+# Modified: 2024-02-18T19:03:15.160Z
 on:
   push:
     branches:
       - 'hotfix/*'
-name: "Gitflow: on - push - branches - hotfix/"
+name: "⚙️ Gitflow: push_branch_hotfix"
 jobs:
   analyze_situation:
     name: "Analysiere Situation"

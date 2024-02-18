@@ -1,0 +1,22 @@
+# Author: Jonathan Starck (jonathan.starck@aiddevs.com)
+# action.yml (c) 2024
+# Desc: description
+# Created:  2024-02-18T20:31:01.934Z
+# Modified: 2024-02-18T20:40:53.210Z
+
+
+name: 'Build and Deploy'
+description: 'Automatically runs through the build and deploy process based on the transferred variables'
+inputs:
+  environment:
+    description: 'Select the environment'
+    required: true
+  version:
+    description: 'Version is only required for the main build'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - run: echo "Ausführen einer Aufgabe mit ${{ inputs.environment }} und ${{ inputs.version }}"
+      shell: bash
