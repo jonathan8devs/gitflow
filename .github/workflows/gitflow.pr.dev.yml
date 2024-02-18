@@ -2,7 +2,7 @@
 # gitflow.pr.dev.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T13:29:06.989Z
-# Modified: 2024-02-18T14:41:36.921Z
+# Modified: 2024-02-18T14:48:32.477Z
 
 on:
   pull_request:
@@ -64,6 +64,7 @@ jobs:
           GITHUB_EVENT_ACTION: ${{ github.event.action }}
           GITHUB_EVENT_REF: ${{ github.event.ref }} 
         run: |
+          CLEAN_BRANCH_NAME=
           CHECK_FOR_UPDATE=false
           BUILD=false
 
@@ -78,11 +79,13 @@ jobs:
               # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
               if [[ $ACTION == 'opened' || $ACTION == 'synchronize' || $ACTION == 'reopened' ]]; then
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_BRANCH_NAME=$BRANCH_NAME
                 CHECK_FOR_UPDATE=true
                 BUILD=true
                 echo "Feature-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
                 echo "CHECK_FOR_UPDATE: $CHECK_FOR_UPDATE"
                 echo "BUILD: $BUILD"
+
               fi
             fi
           elif [[ "$GITHUB_HEAD_REF" =~ ^[Vv][Ee][Rr][Ss][Ii][Oo][Nn]-[Ff][Ii][Ll][Ee]/(.+) ]]; then
@@ -95,6 +98,7 @@ jobs:
               # Bei "opened", "synchronize" oder "reopened" den Pull Request bearbeiten
               if [[ $ACTION == 'opened' || $ACTION == 'synchronize' ]]; then
                 # Hier den Code einfügen, der bei einem neuen, synchronisierten oder wiedergeöffneten Pull Request ausgeführt werden soll.
+                CLEAN_BRANCH_NAME=$BRANCH_NAME
                 CHECK_FOR_UPDATE=false
                 BUILD=false
                 echo "Version-File-Branch: $BRANCH_NAME hat erfolgreich gezogen!"
