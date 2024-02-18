@@ -1,3 +1,3 @@
 # gitflow
 
-Direkter Push auf den erstellten Feature-Branch ohne das ein PR existiert
+Von dem erstellten Feature-Branch wird ein PR auf den dev Branch erstellt
