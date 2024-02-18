@@ -2,7 +2,7 @@
 # pr.hotfix.yml (c) 2024
 # Desc: description
 # Created:  2024-02-18T09:09:37.845Z
-# Modified: 2024-02-18T12:15:27.228Z
+# Modified: 2024-02-18T12:23:49.486Z
 on:
   pull_request:
     branches:
@@ -17,6 +17,7 @@ jobs:
       #NOTE - If the variable `DEBUG_CONTEXT` is set to `true`, the GitHub context variables are output as JSON.
       - name: Debug of GitHub context
         env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
           GITHUB_REF: ${{ github.ref }}       
           GITHUB_REF_NAME: ${{ github.ref_name }} # Name of the current branch or tag
           GITHUB_HEAD_REF: ${{ github.head_ref }}
@@ -42,4 +43,5 @@ jobs:
           echo "GITHUB_EVENT_FORCED: $GITHUB_EVENT_FORCED"
           echo "GITHUB_EVENT_ACTION: $GITHUB_EVENT_ACTION"
           echo "GITHUB_EVENT_REF: $GITHUB_EVENT_REF"
+          echo "GITHUB_CONTEXT: $GITHUB_CONTEXT"
   #!SECTION
