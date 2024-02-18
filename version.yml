@@ -1,7 +1,2 @@
-#Author: Jonathan Starck (jonathan.starck@aiddevs.com)
-#version.yml (c) 2024
-#Desc: description
-#Created:  2024-02-18T13:33:10.084Z
-#Modified: 2024-02-18T14:52:35.952Z
-version: 0.0.1-RC
-
+info:
+  version: 0.0.1-RC

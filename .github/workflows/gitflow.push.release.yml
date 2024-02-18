@@ -1,0 +1,134 @@
+# Author: Jonathan Starck (jonathan.starck@aiddevs.com)
+# gitflow.push.dev.yml (c) 2024
+# Desc: description
+# Created:  2024-02-18T16:29:01.700Z
+# Modified: 2024-02-18T17:47:18.421Z
+on:
+  push:
+    branches:
+      - 'release/*'
+name: "Gitflow: on - push - branches - release/"
+jobs:
+  analyze_situation:
+    name: "Analysiere Situation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug of GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          GITHUB_REF: ${{ github.ref }}       
+          GITHUB_REF_NAME: ${{ github.ref_name }} # Name of the current branch or tag
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_BASE_REF: ${{ github.base_ref }} # Name of the base branch for pull requests
+          GITHUB_EVENT_NAME: ${{ github.event_name }} # Type of the triggering event (e.g. push, pull_request)
+          GITHUB_EVENT_BASE_REF: ${{ github.event.base_ref }}
+          GITHUB_EVENT_COMPARE: ${{ github.event.compare }}
+          GITHUB_EVENT_CREATED: ${{ github.event.created }}
+          GITHUB_EVENT_DELETED: ${{ github.event.created }}
+          GITHUB_EVENT_FORCED: ${{ github.event.forced }}
+          GITHUB_EVENT_ACTION: ${{ github.event.action }}
+          GITHUB_EVENT_REF: ${{ github.event.ref }}
+        run: |
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+          echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
+          echo "GITHUB_BASE_REF: $GITHUB_BASE_REF"
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+          echo "GITHUB_EVENT_BASE_REF: $GITHUB_EVENT_BASE_REF"
+          echo "GITHUB_EVENT_COMPARE: $GITHUB_EVENT_COMPARE"
+          echo "GITHUB_EVENT_CREATED: $GITHUB_EVENT_CREATED"
+          echo "GITHUB_EVENT_DELETED: $GITHUB_EVENT_DELETED"
+          echo "GITHUB_EVENT_FORCED: $GITHUB_EVENT_FORCED"
+          echo "GITHUB_EVENT_ACTION: $GITHUB_EVENT_ACTION"
+          echo "GITHUB_EVENT_REF: $GITHUB_EVENT_REF"
+          echo "GITHUB_CONTEXT: $GITHUB_CONTEXT"
+  #SECTION - run_update_check
+  run_update_check:
+    name: "Update Check"
+    if: ${{ vars.VERSION_FILE_ENABLE == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Setup yq'
+        uses: dcarbone/install-yq-action@v1.1.1
+        with:
+          version: "v4.35.1"
+          download-compressed: "true"
+          force: "false"
+      - name: 'Check yq'
+        run: |
+          which yq
+          yq --version
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Check for Update"
+        id: run-update-check
+        env:
+          VERSION_FILE_PATH: ${{ vars.VERSION_FILE_PATH }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          CREATE_PULL_REQUEST=false
+          BUILD=false
+          NEW_VERSION=${GITHUB_REF_NAME#release/}-RC
+          # Aktuelle Version aus der YAML-Datei lesen
+          CURRENT_VERSION=$(yq eval '.info.version' "$VERSION_FILE_PATH")
+          # Versionen vergleichen
+          if [[ "$CURRENT_VERSION" == "$NEW_VERSION" ]]; then
+            echo "Version identisch: $CURRENT_VERSION"
+            CREATE_PULL_REQUEST=false
+            BUILD=true
+            echo "Kein Update Notwendig"
+          else
+            echo "Versionen unterschiedlich: aktuell $CURRENT_VERSION, neue Version $NEW_VERSION"
+            # YAML-Datei aktualisieren
+            yq eval ".info.version = \"$NEW_VERSION\"" -i "$VERSION_FILE_PATH"
+            echo "YAML-Datei aktualisiert: $NEW_VERSION"
+            CREATE_PULL_REQUEST=true
+            BUILD=false
+            echo "Update durchgeführt"
+          fi
+          echo "run-build=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "create-pull-request=$CREATE_PULL_REQUEST" >> "$GITHUB_OUTPUT"
+          echo "clean-version-name=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+      - name: "Create Pull Request"
+        if: ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
+        id: create-pull-request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: version-file/${{ steps.run-update-check.outputs.clean-version-name }}
+          title: "version-file/${{ steps.run-update-check.outputs.clean-version-name }}"
+          body: "Update Version-File to ${{ steps.run-update-check.outputs.clean-version-name }}"
+          labels: automerge,!work in progress
+          base:  ${{ github.ref_name }}
+          token: ${{ secrets.REPOSITORY_TOKEN }}
+      - name: "Automerge PullRequest"
+        if:  ${{ steps.run-update-check.outputs.create-pull-request == 'true' }}
+        id: automerge-pull-request
+        uses: pascalgn/automerge-action@v0.16.2
+        env:
+          GITHUB_TOKEN: "${{ secrets.REPOSITORY_TOKEN }}"
+          MERGE_LABELS: "automerge,!work in progress"
+          UPDATE_RETRIES: "25"
+          UPDATE_RETRY_SLEEP: "10000"
+          MERGE_RETRIES: "30"
+          MERGE_RETRY_SLEEP: "10000"
+          MERGE_DELETE_BRANCH: "true"
+          MERGE_REQUIRED_APPROVALS: "0"
+          PULL_REQUEST: "${{ steps.create-pull-request.outputs.pull-request-number }}"
+    outputs:
+      run_build: ${{ steps.run-update-check.outputs.run-build }}
+      pull_request_number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+  #!SECTION
+  #SECTION - build
+  build:
+    name: "Possible build process"
+    needs: 
+      - run_update_check
+    if: ${{ !failure() && needs.run_update_check.outputs.run_build == 'true' && needs.run_update_check.outputs.pull_request_number == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Output"
+        run: |
+          echo "The build process could take place here"
+  #!SECTION
