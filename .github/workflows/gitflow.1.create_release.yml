@@ -14,7 +14,7 @@ on:
       version:
         description: "After a hotfix it is necessary to define the next version number yourself major.minor.patch! The version can also be set here if you do not want the version to be incremented automatically!"
         required: false
-name: "🛫 Create Release/Hotfix"
+name: "▶️ Create Release/Hotfix"
 jobs:
   create_release_branch:
     name: "Create Release Branch"
